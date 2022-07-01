@@ -115,11 +115,65 @@ const login = async(req: Request, res: Response, next: NextFunction):Promise<Res
     }
 }
 
+const deposit = async(req: Request, res: Response, next: NextFunction):Promise<Response> => {
+    try{
+        let { name, current_token, deposit_value } = req.body;
+        
+        if(FieldAreEmpty(name)){
+            return res.json({
+                success: false,
+                message: "name field not defined"
+            });
+        };
+
+        if(FieldAreEmpty(current_token)){
+            return res.json({
+                success: false,
+                message: "current token field not defined"
+            });
+        };
+
+        if(! await userAlreadyExists(name)){
+            return res.json({
+                success: false,
+                message: "user already exists"
+            });
+        };
+
+        let user = await getUserByName(name);
+        let deposit_user = user.shift();
+
+        if(current_token !== deposit_user?.current_token){
+            return res.json({
+                success: false,
+                message: "invalid token"
+            });
+        };
+        
+        let new_cash = deposit_user?.cash + deposit_value
+        let user_update = {
+            cash: new_cash
+        }
+
+        await User.findByIdAndUpdate(deposit_user?._id, user_update, {new: true})
+        
+        let user_res = {
+            success: true,
+            new_cash: new_cash,
+        };
+
+        return res.json(user_res);
+    }catch(err){
+        return res.send(err);
+    }
+}
+
 export default { 
     addUser,
     FieldAreEmpty,
     createUserOndDatabase,
     getUserByName,
     userAlreadyExists,
+    deposit,
     login
 }

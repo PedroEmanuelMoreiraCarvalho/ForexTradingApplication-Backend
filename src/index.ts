@@ -14,6 +14,7 @@ app.use(express.urlencoded({extended: false}))
 
 app.post('/user',UserController.addUser);
 app.post('/login',UserController.login);
+app.post('/deposit',UserController.deposit);
 
 const database_url = `mongodb+srv://admin:${Enviroment.ADMIN_PASSWORD}@cluster0.g8pmu7c.mongodb.net/Forex?retryWrites=true&w=majority`;
 

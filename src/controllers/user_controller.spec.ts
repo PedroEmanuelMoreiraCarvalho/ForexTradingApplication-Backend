@@ -39,4 +39,22 @@ describe('login api services should be working', ()=>{
         let response = await supertest(app).post('/login').send({name: "exists", password: "incorrect_password"}).expect(200);
         expect(response.body.success).toBe(false);
     });
+
+    const admin_token = "6b5b430d-817b-4075-a160-893fe7703ba1";
+
+    it('deposit does not success if user does not exists', async()=>{
+        let response = await supertest(app).post('/deposit').send({name: "", current_token: "", deposit_value: 0}).expect(200);
+        expect(response.body.success).toBe(false);
+    });
+
+    it('deposit does not success if token is incorrect', async()=>{
+        let response = await supertest(app).post('/deposit').send({name: "admin", current_token: "incorrect_token", deposit_value: 0}).expect(200);
+        expect(response.body.success).toBe(false);
+    });
+
+    it('deposit should work', async()=>{
+        let response = await supertest(app).post('/deposit').send({name: "admin", current_token: admin_token, deposit_value: 0}).expect(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.new_cash).toBe(0);
+    });
 })
